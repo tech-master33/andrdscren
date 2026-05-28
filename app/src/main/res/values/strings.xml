@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android Screen Reader</string>
+    <string name="service_description">This service provides spoken feedback for screen elements.</string>
+</resources>
