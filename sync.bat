@@ -18,11 +18,11 @@ echo [2/3] Adding your changes...
 git add .
 
 echo.
-echo [3/3] Sending code to techmaster300/andrdscren...
+echo [3/3] Sending code to tech-master33/andrdscren...
 git commit -m "Update from sync tool" >nul 2>&1
 git push origin main
 
 echo.
 echo Done! Your code is on GitHub.
-echo You can check the build here: https://github.com/techmaster300/andrdscren/actions
+echo You can check the build here: https://github.com/tech-master33/andrdscren/actions
 pause
