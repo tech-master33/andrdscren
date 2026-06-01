@@ -1,0 +1,57 @@
+name: Feature request
+description: Suggest something new or improved for the screen reader
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting an improvement.
+        You do not need to know how to code to submit a feature request.
+        Just describe what you want to be able to do.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What task are you trying to accomplish
+      description: Describe the real task you want to complete, not the technical solution. Start with "I want to be able to..."
+      placeholder: "Example: I want to be able to adjust how fast the screen reader speaks without going into the system settings every time."
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: How you currently work around this
+      description: What do you do today when this feature is missing? Describe your workaround, or say "There is no workaround" if you are stuck.
+      placeholder: "Example: I open Settings, navigate to Accessibility, then Text-to-speech, and adjust the rate there. It takes about 20 seconds each time."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed
+    attributes:
+      label: What you would like to see
+      description: Describe the feature in plain language. How would it work? Where would it be in the app?
+      placeholder: "Example: A volume-key shortcut that cycles through three speech rate settings — slow, normal, and fast."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: How much does this affect your daily use
+      options:
+        - Blocks me completely — I cannot do what I need to do
+        - Major inconvenience — I lose significant time working around it
+        - Minor inconvenience — annoying but manageable
+        - Nice to have — would improve the experience but not urgent
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Other apps or devices that handle this well, related issues, or any other context.
+    validations:
+      required: false
