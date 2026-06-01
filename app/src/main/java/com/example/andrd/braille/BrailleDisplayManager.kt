@@ -8,50 +8,50 @@ import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.io.InputStream
 import java.io.OutputStream
 import java.util.UUID
 
 /**
- * Manages the Bluetooth connection to a Braille display and sends text to it.
+ * Manages the Bluetooth SPP connection to a Braille display.
  *
- * Connection uses the Serial Port Profile (SPP / RFCOMM), which is the most
- * widely supported protocol across commercial Braille displays. The display
- * receives UTF-8–encoded Unicode Braille characters and renders them as
- * raised dots.
+ * OUTPUT: translates text to Grade 1 Braille Unicode and writes it to the
+ *         display's output stream via [sendText].
  *
- * Usage:
- *   val manager = BrailleDisplayManager(context)
- *   manager.connect()          // called once when the service starts
- *   manager.sendText("Hello")  // called whenever focus changes
- *   manager.disconnect()       // called when the service stops
+ * INPUT:  reads bytes from the display's input stream in a background
+ *         coroutine and passes each decoded event to [onInput].
+ *         The caller (ScreenReaderService) provides [onInput] so it can
+ *         act on characters and commands without this class needing a
+ *         reference to the service.
  */
-class BrailleDisplayManager(private val context: Context) {
+class BrailleDisplayManager(
+    private val context: Context,
+    /** Called on every decoded input event from the display's keyboard. */
+    private val onInput: ((BrailleInputDecoder.DecodeResult) -> Unit)? = null
+) {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val prefs = BraillePreferences(context)
+    private val decoder = BrailleInputDecoder.Decoder()
 
     private var socket: BluetoothSocket? = null
     private var outputStream: OutputStream? = null
+    private var inputStream: InputStream? = null
 
-    @Volatile
-    private var connected = false
+    @Volatile private var connected = false
 
-    /**
-     * Returns a list of paired Bluetooth devices for the user to choose from.
-     * The UI should call this and show the list so the user can pick their display.
-     */
+    // ── Device selection ──────────────────────────────────────────────────
+
     fun pairedDevices(): List<BluetoothDevice> {
         val adapter = BluetoothAdapter.getDefaultAdapter() ?: return emptyList()
         if (!adapter.isEnabled) return emptyList()
         return adapter.bondedDevices.toList()
     }
 
-    /**
-     * Saves [device] as the Braille display and connects to it immediately.
-     */
     fun selectDevice(device: BluetoothDevice) {
         prefs.deviceAddress = device.address
         prefs.deviceName = device.name
@@ -59,117 +59,117 @@ class BrailleDisplayManager(private val context: Context) {
         connect()
     }
 
-    /**
-     * Connects to the saved Braille display device in the background.
-     * Does nothing if no device has been saved or if already connected.
-     */
+    // ── Connection lifecycle ──────────────────────────────────────────────
+
     fun connect() {
         if (!prefs.enabled) return
         val address = prefs.deviceAddress ?: return
         if (connected) return
-
-        scope.launch {
-            connectToAddress(address)
-        }
+        scope.launch { connectToAddress(address) }
     }
 
     private suspend fun connectToAddress(address: String) = withContext(Dispatchers.IO) {
         try {
             val adapter = BluetoothAdapter.getDefaultAdapter()
             if (adapter == null || !adapter.isEnabled) {
-                Log.w(TAG, "Bluetooth not available or not enabled")
+                Log.w(TAG, "Bluetooth not available")
                 return@withContext
             }
-
             val device = adapter.getRemoteDevice(address)
             adapter.cancelDiscovery()
 
-            Log.i(TAG, "Connecting to Braille display: ${device.name} ($address)")
-
+            Log.i(TAG, "Connecting to ${device.name} ($address)")
             val newSocket = device.createRfcommSocketToServiceRecord(SPP_UUID)
             newSocket.connect()
 
             socket = newSocket
             outputStream = newSocket.outputStream
+            inputStream  = newSocket.inputStream
             connected = true
+            decoder.reset()
 
-            Log.i(TAG, "Connected to Braille display: ${device.name}")
+            Log.i(TAG, "Connected to ${device.name}")
+            sendRaw(BrailleTranslator.translate("BAOSP ready") + "\r")
 
-            // Send a welcome message so the user knows the connection worked
-            sendRaw(BrailleTranslator.translate("BAOSP ready"))
-            sendRaw("\n")
+            // Start the read loop now that we have a live input stream
+            startInputLoop(newSocket.inputStream)
 
         } catch (e: IOException) {
-            Log.e(TAG, "Failed to connect to Braille display: ${e.message}")
+            Log.e(TAG, "Connection failed: ${e.message}")
             connected = false
-            socket = null
-            outputStream = null
+            socket = null; outputStream = null; inputStream = null
         }
     }
 
     /**
-     * Translates [text] to Grade 1 Braille Unicode and sends it to the display.
-     * Silently does nothing if not connected.
+     * Runs continuously in the background, reading one byte at a time from
+     * the display's input stream and forwarding decoded results to [onInput].
      *
-     * Text is truncated to [prefs.displayWidth] cells if longer, so the display
-     * does not receive more characters than it can show at once.
-     * A carriage-return character is appended to move the display cursor to
-     * the start of the line after rendering.
+     * The loop exits cleanly when the socket is closed or the coroutine
+     * scope is cancelled (i.e. when [disconnect] is called).
      */
+    private fun startInputLoop(stream: InputStream) {
+        scope.launch(Dispatchers.IO) {
+            Log.i(TAG, "Braille input loop started")
+            val buf = ByteArray(1)
+            try {
+                while (isActive && connected) {
+                    val bytesRead = stream.read(buf)
+                    if (bytesRead < 0) break          // stream closed by display
+                    val result = decoder.decode(buf[0].toInt())
+                    if (result !is BrailleInputDecoder.DecodeResult.Unknown) {
+                        Log.d(TAG, "Braille input: $result")
+                        onInput?.invoke(result)
+                    }
+                }
+            } catch (e: IOException) {
+                if (connected) Log.w(TAG, "Input stream closed: ${e.message}")
+            } finally {
+                Log.i(TAG, "Braille input loop ended")
+                connected = false
+            }
+        }
+    }
+
+    fun disconnect() {
+        connected = false
+        try { outputStream?.close() } catch (_: IOException) {}
+        try { inputStream?.close()  } catch (_: IOException) {}
+        try { socket?.close()       } catch (_: IOException) {}
+        outputStream = null; inputStream = null; socket = null
+        decoder.reset()
+    }
+
+    // ── Output ────────────────────────────────────────────────────────────
+
     fun sendText(text: String) {
         if (!connected) return
         scope.launch {
             val braille = BrailleTranslator.translate(text)
             val width = prefs.displayWidth
-            val truncated = if (braille.length > width) braille.take(width) else braille
-            sendRaw(truncated)
-            sendRaw("\r") // carriage return — most displays reset cursor on \r
+            val line = if (braille.length > width) braille.take(width) else braille
+            sendRaw(line + "\r")
         }
     }
 
-    /**
-     * Sends [raw] as UTF-8 bytes directly to the display output stream.
-     */
     private fun sendRaw(raw: String) {
         try {
             outputStream?.write(raw.toByteArray(Charsets.UTF_8))
             outputStream?.flush()
         } catch (e: IOException) {
-            Log.e(TAG, "Lost connection to Braille display: ${e.message}")
+            Log.e(TAG, "Send failed: ${e.message}")
             connected = false
-            socket = null
-            outputStream = null
+            socket = null; outputStream = null; inputStream = null
         }
     }
 
-    /**
-     * Closes the Bluetooth connection cleanly.
-     * Call this when the AccessibilityService is destroyed.
-     */
-    fun disconnect() {
-        connected = false
-        try {
-            outputStream?.close()
-            socket?.close()
-        } catch (e: IOException) {
-            Log.w(TAG, "Error while disconnecting: ${e.message}")
-        } finally {
-            outputStream = null
-            socket = null
-        }
-    }
+    // ── State queries ─────────────────────────────────────────────────────
 
-    /** Whether a Braille display is currently connected. */
     fun isConnected(): Boolean = connected
-
-    /** Name of the currently selected device, or null if none saved. */
     fun savedDeviceName(): String? = prefs.deviceName
 
     companion object {
         private const val TAG = "BrailleDisplayManager"
-
-        // Standard Bluetooth Serial Port Profile UUID — works with virtually
-        // all commercial Braille displays that support Bluetooth Classic.
         private val SPP_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
     }
 }
