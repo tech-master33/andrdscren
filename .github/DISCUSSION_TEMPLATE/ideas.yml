@@ -1,0 +1,40 @@
+title: "[Idea] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share an idea for andrdscren — a new feature, a change to how the screen reader behaves, or something you wish worked differently.
+        You do not need to know how to code. Just describe what you want to be able to do.
+        If this is a firm request you want tracked, consider opening a Feature request issue instead.
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What is your idea
+      description: Start with "I want to be able to..." or "It would help if..."
+      placeholder: "Example: It would help if andrdscren announced the number of notifications on an app icon when I land on it, the same way TalkBack does."
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would this help
+      description: Describe the problem it solves or the task it makes easier.
+      placeholder: "Example: Right now I have to open the app to find out if I have unread messages. An announcement on the icon would save me several steps."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the screen reader does this relate to
+      options:
+        - Focus navigation — moving between elements
+        - Announcements — what gets spoken and when
+        - Gestures — swipes, taps, long-presses
+        - TTS integration — the voice that speaks
+        - Settings and configuration
+        - Not sure
+    validations:
+      required: false

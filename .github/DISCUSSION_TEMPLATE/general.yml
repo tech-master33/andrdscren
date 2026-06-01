@@ -1,0 +1,29 @@
+title: ""
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the place for general conversation about andrdscren — the BAOSP screen reader.
+        No question is too small. No topic is off limits as long as it relates to andrdscren or accessible Android.
+
+  - type: textarea
+    id: message
+    attributes:
+      label: What would you like to discuss
+      description: Write as much or as little as you like. Plain language is always fine.
+      placeholder: "Example: I have been using andrdscren for a month and wanted to share some thoughts on how focus navigation compares to TalkBack."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: What is this about
+      options:
+        - My experience using andrdscren
+        - A question about how something works
+        - Comparing andrdscren to TalkBack or other screen readers
+        - The BAOSP project in general
+        - Something else
+    validations:
+      required: false

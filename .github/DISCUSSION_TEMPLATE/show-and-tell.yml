@@ -1,0 +1,39 @@
+title: "[Show] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share how you use andrdscren or the BAOSP screen reader stack.
+        This could be your daily setup, a gesture workflow, or a tip you discovered.
+        It does not have to be technical. If it helps you use your phone, it is worth sharing.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What are you sharing
+      description: Describe your setup, workflow, or discovery in plain language.
+      placeholder: "Example: I paired andrdscren with aotts set to the English (UK) voice and increased the speech rate to 1.4x. It reads faster and sounds more natural to me than any other combination I tried."
+    validations:
+      required: true
+
+  - type: textarea
+    id: how
+    attributes:
+      label: How did you set it up
+      description: Step-by-step if possible, so others can replicate it.
+      placeholder: |
+        1. Installed aotts from the BAOSP nightly release
+        2. Went to Settings → Language and input → Text-to-speech
+        3. Selected AOTTS Pico as the engine, then English (UK) as the voice
+        4. Set speech rate to 1.4 in the same screen
+        5. Enabled andrdscren in Accessibility settings
+    validations:
+      required: false
+
+  - type: input
+    id: device
+    attributes:
+      label: Device and Android version
+      placeholder: "Example: Pixel 4a, Android 13"
+    validations:
+      required: false
