@@ -7,6 +7,9 @@ on:
     branches: [ "main", "master" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build andrdscren APK
@@ -34,18 +37,16 @@ jobs:
       - name: Grant Gradle execute permission
         run: chmod +x gradlew
 
-      # Use ./gradlew (the repo's own wrapper), NOT the system gradle command.
-      # The system gradle version is almost never compatible with the project.
       - name: Build debug APK
         run: ./gradlew clean assembleDebug --no-daemon --stacktrace
 
       - name: Build release APK (unsigned)
-        run: ./gradlew assembleRelease --no-daemon --stacktrace || echo "Release build skipped (needs signing config)"
+        run: ./gradlew assembleRelease --no-daemon --stacktrace || echo "Release skipped (needs signing config)"
 
       - name: Locate APKs
         run: find app/build/outputs/apk -name "*.apk" -exec ls -lh {} \;
 
-      - name: Upload debug APK
+      - name: Upload debug APK as artifact
         uses: actions/upload-artifact@v4
         with:
           name: andrdscren-debug
@@ -53,10 +54,36 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: Upload release APK (if built)
+      - name: Upload release APK as artifact (if built)
         uses: actions/upload-artifact@v4
         with:
           name: andrdscren-release
           path: app/build/outputs/apk/release/
           retention-days: 30
           if-no-files-found: ignore
+
+      # ── Auto-release on every successful push to main ──────────────────
+      # Creates a GitHub Release tagged with the date + short commit SHA.
+      # The APK is attached directly so there is always one link to the
+      # latest build — no digging through the Actions tab needed.
+      - name: Create GitHub Release with APK
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "build-${{ github.run_number }}-${{ github.sha }}"
+          name: "andrdscren build ${{ github.run_number }} — ${{ github.sha }}"
+          body: |
+            Automated build from commit ${{ github.sha }}
+
+            **Commit message:** ${{ github.event.head_commit.message }}
+
+            ## How to install
+            1. Download `app-debug.apk` below
+            2. Transfer it to your Android device
+            3. Install it (allow unknown sources if prompted)
+            4. Go to **Settings → Accessibility → Downloaded services → andrdscren** and enable it
+          prerelease: true
+          files: |
+            app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
