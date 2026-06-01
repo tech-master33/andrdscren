@@ -1,0 +1,87 @@
+name: Bug report
+description: Something in the screen reader is not working correctly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report this.
+        Please fill in each field below. The more detail you give, the faster we can fix it.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Describe exactly what went wrong. One or two sentences is fine.
+      placeholder: "Example: When I swipe right to move to the next element, the screen reader announces the wrong label."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected to happen
+      description: Describe what should have happened instead.
+      placeholder: "Example: The screen reader should announce the button label, not the icon name."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps that cause the problem. Number each step.
+      placeholder: |
+        1. Open the app
+        2. Navigate to the Settings screen by swiping right three times
+        3. Activate the Accessibility toggle
+        4. The app closes unexpectedly
+    validations:
+      required: true
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: How often does this happen
+      options:
+        - Every time I follow the steps above
+        - Most of the time
+        - Only sometimes — hard to reproduce
+        - Only happened once
+    validations:
+      required: true
+
+  - type: input
+    id: android-version
+    attributes:
+      label: Android version
+      description: "Find this in Settings → About phone → Android version"
+      placeholder: "Example: Android 8.1"
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device model
+      description: The brand and model of your phone or tablet
+      placeholder: "Example: Samsung Galaxy A13"
+    validations:
+      required: true
+
+  - type: input
+    id: apk-version
+    attributes:
+      label: andrdscren version
+      description: The short commit SHA shown in the APK filename from the nightly release (example — abc1234)
+      placeholder: "abc1234"
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Any other information that might help. You can paste error messages here if you have them.
+    validations:
+      required: false
