@@ -1,6 +1,6 @@
-# Contributing to andrdscren
+# Contributing to baosp-screenreader
 
-Thank you for contributing to andrdscren, the screen reader built for BAOSP.
+Thank you for contributing to baosp-screenreader, the screen reader built for BAOSP.
 This guide is written to work well with screen readers and keyboard-only navigation.
 Every step is numbered and linear — no visual layout is assumed.
 
@@ -51,10 +51,10 @@ You need:
 
 Forking makes a personal copy of the code under your own GitHub account.
 
-1. Open github.com/tech-master33/andrdscren
+1. Open github.com/tech-master33/baosp-screenreader
 2. Activate the Fork button near the top of the page
 3. On the next screen, activate Create fork
-4. GitHub takes you to your copy at github.com/YOUR-USERNAME/andrdscren
+4. GitHub takes you to your copy at github.com/YOUR-USERNAME/baosp-screenreader
 
 ---
 
@@ -64,9 +64,9 @@ Open a terminal and run these commands one at a time.
 Replace YOUR-USERNAME with your actual GitHub username.
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/andrdscren.git
-cd andrdscren
-git remote add upstream https://github.com/tech-master33/andrdscren.git
+git clone https://github.com/YOUR-USERNAME/baosp-screenreader.git
+cd baosp-screenreader
+git remote add upstream https://github.com/tech-master33/baosp-screenreader.git
 ```
 
 Running `git remote -v` should now show both `origin` (your fork) and `upstream` (the main repo).
@@ -176,7 +176,7 @@ git push origin your-branch-name
 
 Then:
 
-1. Open github.com/YOUR-USERNAME/andrdscren
+1. Open github.com/YOUR-USERNAME/baosp-screenreader
 2. GitHub shows a bar saying your branch was recently pushed
 3. Activate Compare and pull request
 4. Fill in the title: one sentence describing the change
@@ -189,7 +189,7 @@ Then:
 
 You do not need to know how to code to do this. It is one of the most valuable contributions.
 
-1. Open github.com/tech-master33/andrdscren/issues
+1. Open github.com/tech-master33/baosp-screenreader/issues
 2. Activate New issue
 3. Choose Bug report or Feature request
 4. Fill in the title with one short sentence describing the problem or request
@@ -198,7 +198,7 @@ You do not need to know how to code to do this. It is one of the most valuable c
    - What happened instead of what you expected
    - Whether it happens every time or only sometimes
    - Your Android version and device model
-   - Whether the problem also happens with TalkBack or is specific to andrdscren
+   - Whether the problem also happens with TalkBack or is specific to baosp-screenreader
 
 ---
 
@@ -218,9 +218,9 @@ If you have not heard back after a week, add a comment to the pull request to as
 
 ## Community and questions
 
-- Discussions: github.com/tech-master33/andrdscren/discussions
-- Issues: github.com/tech-master33/andrdscren/issues
-- TTS engine: github.com/tech-master33/aotts
+- Discussions: github.com/tech-master33/baosp-screenreader/discussions
+- Issues: github.com/tech-master33/baosp-screenreader/issues
+- TTS engine: github.com/tech-master33/baosp-tts
 - Launcher: github.com/tech-master33/aoler
 - BAOSP main project: github.com/tech-master33/baosp
 
