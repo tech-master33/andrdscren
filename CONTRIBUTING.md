@@ -6,6 +6,35 @@ Every step is numbered and linear — no visual layout is assumed.
 
 ---
 
+## Ways to contribute
+
+You do not need to write code to contribute. Here are all the ways you can help:
+
+1. Report a bug — describe something that does not work as expected
+2. Request a feature — describe something that would help blind users
+3. Improve documentation — fix unclear steps or add missing information
+4. Test builds — install nightly APKs and report screen reader behaviour
+5. Translate — help translate in-app strings to other languages
+6. Write code — fix bugs or add features to the accessibility service
+
+---
+
+## Claiming an issue
+
+If you want to work on an existing issue — especially one tagged `needs help` or `good first issue` — follow these steps first.
+
+1. Open the issue you want to work on
+2. Read the full description, including the "Where to start" section if there is one
+3. Leave a comment saying you would like to work on it — for example: "I'd like to take this on"
+4. Wait for a maintainer to reply — we will assign the issue to you and answer any questions
+5. Once assigned, follow the steps in this guide to fork, branch, make your change, and open a pull request
+
+This step matters because it avoids two people doing the same work at the same time.
+If you have been assigned an issue and decide you cannot continue, leave a comment to let us know.
+We will unassign it so someone else can pick it up.
+
+---
+
 ## Before you start
 
 You need:
@@ -57,13 +86,14 @@ Name the branch something descriptive. Examples:
 - `fix/tts-crash-on-startup`
 - `feature/add-swipe-gestures`
 - `docs/update-readme`
+- `a11y/improve-focus-order`
 
 ---
 
 ## Step 4 — Make your changes
 
 Open the project in Android Studio or your editor.
-The project uses Kotlin and Jetpack Compose. Key directories:
+The project uses Kotlin. Key directories:
 
 - `app/src/main/java/` — all Kotlin source code
 - `app/src/main/res/` — XML resources, strings, and layouts
@@ -77,7 +107,8 @@ Every change must follow these rules:
 2. Do not use color alone to communicate information — also use text or shape
 3. Focus order must be logical when navigating by swipe or keyboard
 4. Touch targets must be at least 48dp wide and 48dp tall
-5. Test every change with the screen reader turned on before submitting
+5. All strings shown to the user must be in `strings.xml` so they can be translated
+6. Test every change with the screen reader turned on before submitting
 
 ---
 
@@ -133,7 +164,7 @@ type: short summary in plain English
 Longer explanation if needed. Explain the problem, not just the fix.
 ```
 
-Types: `fix`, `feature`, `docs`, `refactor`, `test`
+Types: `fix`, `feature`, `docs`, `refactor`, `a11y`, `test`
 
 ---
 
@@ -146,7 +177,7 @@ git push origin your-branch-name
 Then:
 
 1. Open github.com/YOUR-USERNAME/andrdscren
-2. GitHub shows a yellow bar saying your branch was recently pushed
+2. GitHub shows a bar saying your branch was recently pushed
 3. Activate Compare and pull request
 4. Fill in the title: one sentence describing the change
 5. Fill in the description: what problem does this solve, how did you test it
@@ -154,21 +185,44 @@ Then:
 
 ---
 
-## Reporting a bug
+## Reporting a bug or requesting a feature
+
+You do not need to know how to code to do this. It is one of the most valuable contributions.
 
 1. Open github.com/tech-master33/andrdscren/issues
 2. Activate New issue
-3. Fill in the title with a short description of the problem
-4. In the body, include:
-   - What you were doing when the problem happened
-   - What you expected to happen
-   - What actually happened
+3. Choose Bug report or Feature request
+4. Fill in the title with one short sentence describing the problem or request
+5. In the body, include:
+   - What you were trying to do
+   - What happened instead of what you expected
+   - Whether it happens every time or only sometimes
    - Your Android version and device model
-   - Whether the problem happens every time or only sometimes
+   - Whether the problem also happens with TalkBack or is specific to andrdscren
 
 ---
 
-## Getting help
+## Code review process
 
-Open a discussion at github.com/tech-master33/andrdscren/discussions
-and describe your question. You do not need to know the solution — just describe what you are trying to do.
+After you open a pull request:
+
+1. A maintainer will read your changes and may ask questions in the comments
+2. Reply to comments — activate the Resolve conversation button once you have addressed the point
+3. If changes are requested, push new commits to the same branch — the pull request updates automatically
+4. Once approved, a maintainer will merge your pull request
+
+Most pull requests receive a first response within a few days.
+If you have not heard back after a week, add a comment to the pull request to ask for an update.
+
+---
+
+## Community and questions
+
+- Discussions: github.com/tech-master33/andrdscren/discussions
+- Issues: github.com/tech-master33/andrdscren/issues
+- TTS engine: github.com/tech-master33/aotts
+- Launcher: github.com/tech-master33/aoler
+- BAOSP main project: github.com/tech-master33/baosp
+
+Open a discussion if you have a question. Describe what you are trying to do and where you are stuck.
+You do not need to have a solution — questions about how things work are welcome.
