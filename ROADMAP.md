@@ -1,4 +1,4 @@
-# andrdscren Roadmap
+# baosp-screenreader Roadmap
 
 This document describes what we plan to build next, why each item matters,
 and what state each one is in. It is updated as things change.
@@ -7,7 +7,7 @@ If you want to work on something listed here, open an issue or discussion first
 so we can coordinate and avoid duplicated effort.
 
 If something important to you is missing, open a feature request at
-github.com/tech-master33/andrdscren/issues — the issue templates will ask you
+github.com/tech-master33/baosp-screenreader/issues — the issue templates will ask you
 the right questions.
 
 ---
@@ -92,7 +92,7 @@ wherever they stopped.
 
 ### Keyboard and switch access compatibility — Needs help
 
-**What it is:** Ensure andrdscren works correctly alongside Android's Switch Access
+**What it is:** Ensure baosp-screenreader works correctly alongside Android's Switch Access
 service and with Bluetooth keyboards.
 
 **Why it matters:** Some blind users also have motor disabilities and cannot use a
@@ -100,7 +100,7 @@ touchscreen. They use switch devices or keyboards. The screen reader must not in
 key events that Switch Access needs, and must announce focus changes triggered by
 keyboard navigation.
 
-**Where to start:** Test andrdscren with Switch Access enabled simultaneously.
+**Where to start:** Test baosp-screenreader with Switch Access enabled simultaneously.
 File any focus announcement or key event conflicts as issues.
 
 ---
@@ -165,34 +165,34 @@ navigation and reads continuous text, the way a human would read aloud.
 
 ## Braille support
 
-### Braille display — read mode — Planned
+### Braille display — read mode — Done
 
 **What it is:** Connect a Bluetooth Braille display and read the currently focused
-element's text on it in real time.
+element's text on it in real time via Bluetooth SPP (RFCOMM).
 
-**Why it matters:** Some blind users are Deafblind — they cannot use audio.
-For them, a Braille display is the only way to read a phone screen.
-Without this, BAOSP is not usable at all for Deafblind people.
-
-**Proposed approach:** Use the Android Bluetooth HID profile to communicate
-with BrailleBack-compatible displays. Send the focused element's text as Grade 1
-Braille. Start with read-only mode before adding Braille keyboard input.
-
-**Dependencies:** Requires Android 12 or above for the BT HID APIs.
-This is a significant feature — if you want to lead this work, open a discussion first.
+**Status:** Shipped. `BrailleDisplayManager` connects over Bluetooth Classic and
+streams Grade 1 Braille cells. `BrailleTranslator` encodes text to 6-dot Braille.
 
 ---
 
-### Braille display — input mode — Long term
+### Braille display — input mode — Done
 
 **What it is:** Type using the Braille keyboard on a connected display and have the
 input sent to the focused text field.
 
-**Why it matters:** Braille keyboard input is the preferred text entry method for
-many Deafblind and experienced Braille users. It is significantly faster than using
-the on-screen keyboard by touch.
+**Status:** Shipped. `BrailleInputDecoder` decodes incoming dot patterns to characters.
+`BrailleInputHandler` routes decoded input to accessibility actions (type text, navigate,
+activate). Both are wired into `ScreenReaderService`.
 
-**Status:** Not started. Depends on Braille display read mode being completed first.
+---
+
+### HID Braille profile — Long term
+
+**What it is:** Add support for the standard BT HID Braille profile in addition to SPP,
+for displays that do not support RFCOMM.
+
+**Status:** Not started. Requires Android 12+ BT HID APIs.
+If you want to lead this, open a discussion first.
 
 ---
 
@@ -203,9 +203,8 @@ the on-screen keyboard by touch.
 **What it is:** Ensure the screen reader works correctly in apps that use right-to-left
 (RTL) text layout — Arabic, Hebrew, Farsi, and others.
 
-**Why it matters:** Swipe navigation in andrdscren currently follows left-to-right
-reading order. In an RTL app, this means the user moves through elements in the wrong
-direction. RTL users get a broken experience.
+**Why it matters:** Swipe navigation currently follows left-to-right reading order.
+In an RTL app, this means the user moves through elements in the wrong direction.
 
 **Proposed approach:** Detect the app's layout direction from its `WindowInfo`.
 Reverse the swipe direction mapping when the active window uses RTL layout.
@@ -214,17 +213,15 @@ Reverse the swipe direction mapping when the active window uses RTL layout.
 
 ### Multilingual content detection — Planned
 
-**What it is:** When the focused element contains text in a language different from
+**What it is:** When the focused element contains text in a different language than
 the system language, switch the TTS engine to the matching voice automatically.
 
-**Why it matters:** If a user's phone is set to English but they receive a message
-in Spanish, the English voice reads the Spanish words with English pronunciation —
-which is often incomprehensible. Auto-switching the voice makes multilingual content
-understandable.
+**Why it matters:** If a user's phone is set to English and they receive a message in
+Spanish, the English voice reads the Spanish words with English pronunciation —
+which is often incomprehensible.
 
-**Dependencies:** Requires aotts (or another TTS engine) to have the needed language
-voices installed. Uses Android's `TextClassifier` or a lightweight language detection
-library to identify the language before sending text to TTS.
+**Dependencies:** Requires baosp-tts (or another TTS engine) to have the needed language
+voices installed.
 
 ---
 
